@@ -4,7 +4,7 @@
 
 # Installation
 ```bash
-git clone <repo> folder && cd folder
+git clone https://github.com/marklirika/connection-manager connection-manager && cd connection-manager
 source prepare.sh
 make
 ```
@@ -24,15 +24,11 @@ CM works in two modes:
 
 In **Mock Mode**, CM simulates a connection by pinging the interface it is connected to. The connection is considered lost when the ping fails. **Mock Mode** is enabled by default.
 
-To create `eth0/eth1` mock interfaces you can utilze
+To create and control virtual `eth0/eth1` mock interfaces you can utilze
 ```bash
-./interfaces up
+./interfaces <up|down> [0|1]
 ```
-And
-```bash
-./interfaces down
-```
-To put them down
+To turn of/off and also additionally if you want choose particular interface
 
 ### SSH Mode
 

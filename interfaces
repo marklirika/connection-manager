@@ -7,40 +7,72 @@ INTERFACE_0="eth0"
 INTERFACE_1="eth1"
 
 up() {
-    sudo ip link add $INTERFACE_0 type dummy
-    sudo ip link add $INTERFACE_1 type dummy
+    if [[ $1 -eq 0 ]]; then
+        sudo ip link add $INTERFACE_0 type dummy
+        sudo ip link set $INTERFACE_0 up
+        sudo ip addr add $IP_ETH0/$NETMASK dev $INTERFACE_0
+        echo "Interface $INTERFACE_0 turned on with IP $IP_ETH0"
+    elif [[ $1 -eq 1 ]]; then
+        sudo ip link add $INTERFACE_1 type dummy
+        sudo ip link set $INTERFACE_1 up
+        sudo ip addr add $IP_ETH1/$NETMASK dev $INTERFACE_1
+        echo "Interface $INTERFACE_1 turned on with IP $IP_ETH1"
+    else
+        sudo ip link add $INTERFACE_0 type dummy
+        sudo ip link add $INTERFACE_1 type dummy
 
-    sudo ip link set $INTERFACE_0 up
-    sudo ip link set $INTERFACE_1 up
+        sudo ip link set $INTERFACE_0 up
+        sudo ip link set $INTERFACE_1 up
 
-    sudo ip addr add $IP_ETH0/$NETMASK dev $INTERFACE_0
-    sudo ip addr add $IP_ETH1/$NETMASK dev $INTERFACE_1
+        sudo ip addr add $IP_ETH0/$NETMASK dev $INTERFACE_0
+        sudo ip addr add $IP_ETH1/$NETMASK dev $INTERFACE_1
 
-    echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned on with IPs $IP_ETH0/$IP_ETH1"
+        echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned on with IPs $IP_ETH0/$IP_ETH1"
+    fi
 }
 
 down() {
-    sudo ip addr del $IP_ETH0/$NETMASK dev $INTERFACE_0
-    sudo ip addr del $IP_ETH1/$NETMASK dev $INTERFACE_1
+    if [[ $1 -eq 0 ]]; then
+        sudo ip addr del $IP_ETH0/$NETMASK dev $INTERFACE_0
+        sudo ip link set $INTERFACE_0 down
+        sudo ip link delete $INTERFACE_0
+        echo "Interface $INTERFACE_0 turned off"
+    elif [[ $1 -eq 1 ]]; then
+        sudo ip addr del $IP_ETH1/$NETMASK dev $INTERFACE_1
+        sudo ip link set $INTERFACE_1 down
+        sudo ip link delete $INTERFACE_1
+        echo "Interface $INTERFACE_1 turned off"
+    else
+        sudo ip addr del $IP_ETH0/$NETMASK dev $INTERFACE_0
+        sudo ip addr del $IP_ETH1/$NETMASK dev $INTERFACE_1
 
-    sudo ip link set $INTERFACE_0 down
-    sudo ip link set $INTERFACE_1 down
+        sudo ip link set $INTERFACE_0 down
+        sudo ip link set $INTERFACE_1 down
 
-    sudo ip link delete $INTERFACE_0
-    sudo ip link delete $INTERFACE_1
+        sudo ip link delete $INTERFACE_0
+        sudo ip link delete $INTERFACE_1
 
-    echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned off"
+        echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned off"
+    fi
 }
 
 case "$1" in
     up)
-        up
+        if [[ -n $2 ]]; then
+            up $2
+        else
+            up
+        fi
         ;;
     down)
-        down
+        if [[ -n $2 ]]; then
+            down $2
+        else
+            down
+        fi
         ;;
     *)
-        echo "usage: $0 {up|down}"
+        echo "usage: $0 {up|down} [0|1]"
         exit 1
         ;;
 esac
