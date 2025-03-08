@@ -1,0 +1,46 @@
+#!/bin/bash
+
+IP_ETH0="192.168.1.2"
+IP_ETH1="192.168.2.2"
+NETMASK="255.255.255.0"
+INTERFACE_0="eth0"
+INTERFACE_1="eth1"
+
+up() {
+    sudo ip link add $INTERFACE_0 type dummy
+    sudo ip link add $INTERFACE_1 type dummy
+
+    sudo ip link set $INTERFACE_0 up
+    sudo ip link set $INTERFACE_1 up
+
+    sudo ip addr add $IP_ETH0/$NETMASK dev $INTERFACE_0
+    sudo ip addr add $IP_ETH1/$NETMASK dev $INTERFACE_1
+
+    echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned on with IPs $IP_ETH0/$IP_ETH1"
+}
+
+down() {
+    sudo ip addr del $IP_ETH0/$NETMASK dev $INTERFACE_0
+    sudo ip addr del $IP_ETH1/$NETMASK dev $INTERFACE_1
+
+    sudo ip link set $INTERFACE_0 down
+    sudo ip link set $INTERFACE_1 down
+
+    sudo ip link delete $INTERFACE_0
+    sudo ip link delete $INTERFACE_1
+
+    echo "Interfaces $INTERFACE_0/$INTERFACE_1 turned off"
+}
+
+case "$1" in
+    up)
+        up
+        ;;
+    down)
+        down
+        ;;
+    *)
+        echo "usage: $0 {up|down}"
+        exit 1
+        ;;
+esac
